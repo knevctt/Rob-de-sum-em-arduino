@@ -1,0 +1,111 @@
+int IN1 = 4;
+int IN2 = 5;
+int IN3 = 6;
+int IN4 = 7;
+
+const int triggerPin = 11;
+const int echoPin = 10;
+
+const int sensor_frente = 12;
+const int sensor_tras = 13;
+
+void setup()
+{
+    Serial.begin(9600);
+
+    pinMode(IN1, OUTPUT);
+    pinMode(IN2, OUTPUT);
+    pinMode(IN3, OUTPUT);
+    pinMode(IN4, OUTPUT);
+
+    pinMode(sensor_frente, INPUT);
+    pinMode(sensor_tras, INPUT);
+
+    pinMode(triggerPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+}
+
+float medirDistancia()
+{
+    digitalWrite(triggerPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(triggerPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(triggerPin, LOW);
+    float distancia = pulseIn(echoPin, HIGH) / 58.0;
+    return distancia;
+}
+
+void parar()
+{
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
+}
+
+void re()
+{
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 150);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 150);
+}
+
+void v1()
+{
+    analogWrite(IN1, 150);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 150);
+    analogWrite(IN4, 0);
+}
+
+void v2()
+{
+    analogWrite(IN1, 250);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 250);
+    analogWrite(IN4, 0);
+}
+
+void volta()
+{
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 250);
+    analogWrite(IN3, 250);
+    analogWrite(IN4, 0);
+
+    delay(500);
+}
+
+void loop()
+{
+    float distancia = medirDistancia();
+
+    if (distancia < 15)
+    {
+        Serial.print("Parado\n");
+        v2();
+    }
+
+    if(digitalRead(sensor_frente) == HIGH){
+    Serial.print("Volta, linha preta reconhecida\n");
+    
+    parar();
+    re();
+    delay(500);
+    volta();
+  } 
+
+  if(digitalRead(sensor_tras) == HIGH){
+    Serial.print("Frente, linha preta reconhecida\n");
+    v2();
+  }
+  if(digitalRead(sensor_frente) == LOW && digitalRead(sensor_tras) == LOW) {
+    Serial.print("Nada reconhecido\n");
+    v1();
+  }
+  else{
+    v1();
+  }
+}
